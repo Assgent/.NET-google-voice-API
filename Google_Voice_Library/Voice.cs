@@ -8,9 +8,9 @@ namespace Google_Voice_Library
 {
     public sealed class Voice : IDisposable
     {
-        private readonly string VOICE_URL_SMS = "https://voice.google.com/u/0/messages";
-        private readonly string VOICE_URL_CALL = "https://voice.google.com/u/5/calls";
-        private readonly string LOGIN_URL = "https://accounts.google.com/signin/oauth/identifier?client_id=717762328687-iludtf96g1hinl76e4lc1b9a82g457nn.apps.googleusercontent.com&scope=profile%20email&redirect_uri=https%3A%2F%2Fstackauth.com%2Fauth%2Foauth2%2Fgoogle&state=%7B%22sid%22%3A1%2C%22st%22%3A%2259%3A3%3ABBC%2C16%3A167d1b1c2b78a437%2C10%3A1592880449%2C16%3A2768d00883f11498%2Cb9f2a310e70b2db0e958d0e6f3d60538a13e2a2c42558c483637ce63c6ef9686%22%2C%22cdl%22%3Anull%2C%22cid%22%3A%22717762328687-iludtf96g1hinl76e4lc1b9a82g457nn.apps.googleusercontent.com%22%2C%22k%22%3A%22Google%22%2C%22ses%22%3A%220897d76460724515b1f8b1f346a0e16b%22%7D&response_type=code&o2v=1&as=sfiR-q4x2F7Vuwx4lCZI1A&flowName=GeneralOAuthFlow";
+        private static readonly string VOICE_URL_SMS = "https://voice.google.com/u/0/messages";
+        private static readonly string VOICE_URL_CALL = "https://voice.google.com/u/5/calls";
+        private static readonly string LOGIN_URL = "https://accounts.google.com/signin/oauth/identifier?client_id=717762328687-iludtf96g1hinl76e4lc1b9a82g457nn.apps.googleusercontent.com&scope=profile%20email&redirect_uri=https%3A%2F%2Fstackauth.com%2Fauth%2Foauth2%2Fgoogle&state=%7B%22sid%22%3A1%2C%22st%22%3A%2259%3A3%3ABBC%2C16%3A167d1b1c2b78a437%2C10%3A1592880449%2C16%3A2768d00883f11498%2Cb9f2a310e70b2db0e958d0e6f3d60538a13e2a2c42558c483637ce63c6ef9686%22%2C%22cdl%22%3Anull%2C%22cid%22%3A%22717762328687-iludtf96g1hinl76e4lc1b9a82g457nn.apps.googleusercontent.com%22%2C%22k%22%3A%22Google%22%2C%22ses%22%3A%220897d76460724515b1f8b1f346a0e16b%22%7D&response_type=code&o2v=1&as=sfiR-q4x2F7Vuwx4lCZI1A&flowName=GeneralOAuthFlow";
                                             //We login into stack overflow to circumvent google automated login detection
 
         private readonly IWebDriver browser;
@@ -40,6 +40,9 @@ namespace Google_Voice_Library
 
         public void Login(string emailIn, SecureString passwordIn) 
         {
+            if (!NeedLogin())
+                return;
+
             browser.Url = LOGIN_URL;
 
             using (LoginAttempt login = new LoginAttempt(emailIn, passwordIn, browser))
