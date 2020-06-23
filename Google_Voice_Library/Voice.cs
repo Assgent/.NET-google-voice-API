@@ -14,12 +14,10 @@ namespace Google_Voice_Library
                                             //We login into stack overflow to circumvent google automated login detection
 
         private readonly IWebDriver browser;
-        private bool loggedIn;
 
         public Voice(IWebDriver browserIn) 
         {
             browser = browserIn;
-            loggedIn = false;
         }
 
         ~Voice()
@@ -48,21 +46,17 @@ namespace Google_Voice_Library
             {
                 login.TryLogin();
             }
-
-            loggedIn = true;
         }
 
-        public bool SendText(Text text)
+        public void SendText(Text text)
         {
-            return SendTexts(new Text[] { text });
+            SendTexts(new Text[] { text });
         }
 
-        public bool SendTexts(Text[] texts)
+        public void SendTexts(Text[] texts)
         {
-            bool allSuccessful = true;
-
-            if (!loggedIn)
-                throw new InvalidOperationException("This instance must be logged into Google Voice!");
+            if (NeedLogin())
+                throw new InvalidOperationException("This instance must be logged into Google Voice.");
 
             foreach (Text text in texts) 
             {
@@ -82,8 +76,6 @@ namespace Google_Voice_Library
 
                 WaitUntilMessageSent(Utilities.GetUnixTimestamp());
             }
-
-            return allSuccessful;
         }
 
         private void WaitUntilMessageSent(ulong currentTimestamp) //Wait until message has finished sending
@@ -103,6 +95,9 @@ namespace Google_Voice_Library
 
         public void MakeCalls(Call[] calls)
         {
+            if (NeedLogin())
+                throw new InvalidOperationException("This instance must be logged into Google Voice.");
+
             throw new NotImplementedException("This feature has not yet been implemented!"); //TODO: Finish
         }
     }
