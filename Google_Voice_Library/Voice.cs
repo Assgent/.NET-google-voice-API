@@ -108,10 +108,12 @@ namespace Google_Voice_Library
             if (NeedLogin())
                 throw new InvalidOperationException("This instance must be logged into Google Voice.");
 
-            foreach (Call call in calls)
+            throw new NotImplementedException("This feature has not yet been implemented!");
+
+            /*foreach (Call call in calls)
             {
                 browser.Url = VOICE_URL_CALL;
-            }
+            }*/
         }
     }
 
