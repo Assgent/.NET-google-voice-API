@@ -19,7 +19,7 @@ namespace Google_Voice_Library
         }
     }
 
-    public class Text
+    public sealed class Text
     {
         public readonly Number Destination;
         public readonly string Message;
@@ -31,7 +31,7 @@ namespace Google_Voice_Library
         }
     }
 
-    public class Call
+    public sealed class Call
     {
         public readonly Number Destination;
         public readonly object Audio;

@@ -40,14 +40,14 @@ namespace Google_Voice_Library
 
         public void Login(string emailIn, SecureString passwordIn) 
         {
-            if (!NeedLogin())
-                return;
-
-            browser.Url = LOGIN_URL;
-
-            using (LoginAttempt login = new LoginAttempt(emailIn, passwordIn, browser))
+            if (NeedLogin())
             {
-                login.TryLogin();
+                browser.Url = LOGIN_URL;
+
+                using (LoginAttempt login = new LoginAttempt(emailIn, passwordIn, browser))
+                {
+                    login.TryLogin();
+                }
             }
         }
 
@@ -77,23 +77,30 @@ namespace Google_Voice_Library
                 messageInputBox.SendKeys(text.Message);
                 messageInputBox.SendKeys(Keys.Enter);
 
-                WaitUntilMessageSent(Utilities.GetUnixTimestamp());
+                bool messageSent = WaitUntilMessageSent(Utilities.GetUnixTimestamp());
+
+                if (!messageSent)
+                {
+                    throw new SMSSendException("An attempt to send a message has timed out!", text);
+                }
             }
         }
 
-        private void WaitUntilMessageSent(ulong currentTimestamp) //Wait until message has finished sending
+        private bool WaitUntilMessageSent(ulong currentTimestamp) //Wait until message has finished sending
         {
             ulong timeout = currentTimestamp + 10;
 
             new WebDriverWait(browser, TimeSpan.FromMilliseconds(500));
             while (browser.PageSource.Contains("Sending..."))
                 if (Utilities.GetUnixTimestamp() > timeout) //Checks if 10 seconds have passed
-                    throw new TimeoutException("An attempt to send a message has timed out!");
+                    return false;
+
+            return true;
         }
 
         public void MakeCall(Call call)
         {
-            throw new NotImplementedException("This feature has not yet been implemented!"); //TODO: Finish
+            MakeCalls(new Call[] { call });
         }
 
         public void MakeCalls(Call[] calls)
@@ -101,7 +108,10 @@ namespace Google_Voice_Library
             if (NeedLogin())
                 throw new InvalidOperationException("This instance must be logged into Google Voice.");
 
-            throw new NotImplementedException("This feature has not yet been implemented!"); //TODO: Finish
+            foreach (Call call in calls)
+            {
+                browser.Url = VOICE_URL_CALL;
+            }
         }
     }
 
@@ -110,6 +120,16 @@ namespace Google_Voice_Library
         public LoginException(string reason) : base(reason)
         {
 
+        }
+    }
+
+    class SMSSendException : Exception 
+    {
+        public readonly Text ProblemMessage;
+
+        public SMSSendException(string reason, Text problemMsgIn) : base(reason)
+        {
+            ProblemMessage = problemMsgIn;
         }
     }
 }
